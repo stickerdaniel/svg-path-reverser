@@ -135,7 +135,7 @@ function updateSvgWithReversedPaths() {
 $('#copy-btn').on('click', function() {
     const updatedSvg = resultEditor.getValue();
     navigator.clipboard.writeText(updatedSvg).then(function() {
-        //alert('Updated SVG copied to clipboard!');
+        alert('Updated SVG copied to clipboard!');
     }, function() {
         alert('Failed to copy SVG');
     });
