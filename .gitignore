@@ -1,0 +1,7 @@
+# .gitignore
+
+# Ignore .idea folder (used by JetBrains IDEs)
+.idea/
+
+# Ignore macOS system files
+.DS_Store
