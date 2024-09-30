@@ -33,13 +33,8 @@ body {
 
 /* SVG Preview Styling */
 #svg-preview {
-    width: 100%;
-    height: 200px;
+    height: 230px;
     overflow: auto;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     resize: vertical;
 }
 

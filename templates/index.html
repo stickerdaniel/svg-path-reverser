@@ -5,9 +5,12 @@
     <title>SVG Path Reverser</title>
 
     <!-- Favicon Tags -->
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180"
+          href="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32"
+          href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16"
+          href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='favicon/site.webmanifest') }}">
     <link rel="mask-icon" href="{{ url_for('static', filename='favicon/safari-pinned-tab.svg') }}" color="#65c3c7">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
@@ -16,7 +19,7 @@
     <meta name="theme-color" content="#ffffff">
 
     <!-- DaisyUI and Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Custom Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
@@ -30,7 +33,9 @@
         This tool allows you to reverse specific paths in your SVG.
         Paste your SVG code, toggle the paths, and get the updated SVG with reversed paths.
         <br>
-        Why would you need this? When animating SVG paths using the <a href="https://css-tricks.com/svg-line-animation-works/" target="_blank">dash-offset technique</a>, you might want to animate the path in the opposite direction.
+        Why would you need this? When animating SVG paths using the <u><a
+            href="https://css-tricks.com/svg-line-animation-works/" target="_blank">dash-offset technique</a></u>, you might
+        want to animate the path in the opposite direction.
     </p>
 
     <!-- SVG Editor -->
@@ -40,7 +45,8 @@
     <div class="flex mt-3 mb-6">
         <button id="parse-btn" class="btn btn-primary rounded-full">
             <!-- SVG Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" height="24px" viewBox="0 0 24 24" width="24px"
+                 fill="currentColor">
                 <path d="M0 0h24v24H0z" fill="none"/>
                 <path d="M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 2.44-2.44 2.12 2.12-2.44 2.44z"/>
             </svg>
@@ -49,15 +55,23 @@
     </div>
 
     <!-- Paths List and SVG Rendering -->
-    <div id="settings" class="flex flex-wrap mt-6" style="display: none;">
-        <div class="">
+    <div id="settings" class="flex flex-col lg:flex-row mt-6" style="display: none;">
+        <div class="flex flex-col mb-6">
+            <!-- Paths List -->
             <h2 class="text-2xl font-semibold mb-3">Paths</h2>
             <div id="path-list" class="mb-6"></div>
+            <!-- Animate SVG -->
+            <h2 class="text-2xl font-semibold mb-3">Animate</h2>
+            <div class="flex flex-row gap-2 mb-auto">
+                <button id="animate-original" class="btn btn-accent rounded-full">Original</button>
+                <button id="animate-reverted" class="btn btn-accent rounded-full">Reversed</button>
+            </div>
         </div>
         <div class="grow">
             <h2 class="text-2xl font-semibold mb-3">SVG Preview</h2>
             <!-- Render new SVG here -->
-            <div id="svg-preview" class="container-outline p-2">
+            <!-- SVG Preview -->
+            <div id="svg-preview" class="grow flex min-w-fit container-outline p-2 h-full justify-center items-center">
                 <!-- SVG Preview -->
             </div>
         </div>
@@ -80,11 +94,14 @@
     var defaultSvg = decodeURIComponent("{{ default_svg | urlencode }}");
 </script>
 
+<!-- GSAP for animations -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Ace Editor -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
 <!-- Custom Scripts -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/anim.mjs') }}"></script>
 </body>
 </html>

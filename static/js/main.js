@@ -12,8 +12,11 @@ resultEditor.session.setMode("ace/mode/svg");
 resultEditor.setReadOnly(true); // Make the editor read-only
 resultEditor.renderer.setShowPrintMargin(false); // Remove the gray line
 
-let originalSvgCode = '';
 let reversedPaths = [];
+
+// variables to store SVG content
+let originalSvg = '';
+let modifiedSvg = '';
 
 $('#parse-btn').on('click', function() {
     const svgCode = editor.getValue();
@@ -21,14 +24,14 @@ $('#parse-btn').on('click', function() {
         alert("Please paste the SVG code!");
         return;
     }
-    originalSvgCode = svgCode;
+    originalSvg = svgCode;
     $.ajax({
         url: '/process-svg',
         type: 'POST',
         data: { svg_code: svgCode },
         success: function(response) {
             const data = response.paths;
-            const updatedSvg = response.updated_svg;
+            originalSvg = response.updated_svg;
             $('#path-list').empty();
             reversedPaths = [];  // Reset reversed paths on each parse
 
@@ -78,7 +81,10 @@ $('#parse-btn').on('click', function() {
             updateSvgWithReversedPaths();
 
             // Update the result editor with the initial updated SVG
-            resultEditor.setValue(updatedSvg, -1);
+            resultEditor.setValue(originalSvg, -1);
+
+            // Render the original SVG in the preview
+            $('#svg-preview').html(originalSvg);
         },
         error: function(xhr, status, error) {
             alert("Error: " + xhr.responseText);
@@ -109,21 +115,20 @@ function updateSvgWithReversedPaths() {
         url: '/reverse-paths',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ svg_code: originalSvgCode, paths_to_reverse: reversedPaths }),
+        data: JSON.stringify({ svg_code: originalSvg, paths_to_reverse: reversedPaths }),
         success: function(data) {
-            const updatedSvg = data.updated_svg;
+            modifiedSvg = data.updated_svg;
 
             // Update the result editor
-            resultEditor.setValue(updatedSvg, -1);
+            resultEditor.setValue(modifiedSvg, -1);
 
             // Render the updated SVG
-            $('#svg-preview').html(updatedSvg);
+            $('#svg-preview').html(modifiedSvg);
 
-            // Trigger a reflow
-            // get element #svg-preview and force a reflow
+            // Trigger a reflow (optional)
             const elm = document.getElementById('svg-preview');
-            // add 1 px to height
             elm.style.height = elm.offsetHeight + 1 + 'px';
+            elm.style.height = elm.offsetHeight - 1 + 'px';
         },
         error: function(xhr, status, error) {
             alert("Error: " + xhr.responseText);
@@ -131,12 +136,27 @@ function updateSvgWithReversedPaths() {
     });
 }
 
-
 $('#copy-btn').on('click', function() {
-    const updatedSvg = resultEditor.getValue();
-    navigator.clipboard.writeText(updatedSvg).then(function() {
+    navigator.clipboard.writeText(modifiedSvg).then(function() {
         alert('Updated SVG copied to clipboard!');
     }, function() {
         alert('Failed to copy SVG');
     });
+});
+
+// Add event listeners for animation buttons
+$('#animate-original').on('click', function() {
+    // Display the original SVG
+    $('#svg-preview').html(originalSvg);
+    // Animate the paths
+    let svgElement = $('#svg-preview svg')[0];
+    animateSVGPaths(svgElement, 1); // Animate over 2 seconds
+});
+
+$('#animate-reverted').on('click', function() {
+    // Display the modified SVG
+    $('#svg-preview').html(modifiedSvg);
+    // Animate the paths
+    let svgElement = $('#svg-preview svg')[0];
+    animateSVGPaths(svgElement, 1); // Animate over 2 seconds
 });

@@ -5,6 +5,7 @@ import os
 
 app = Flask(__name__)
 
+
 # Function to extract paths from SVG
 def extract_paths(svg_content):
     parser = ET.XMLParser(recover=True)
@@ -36,16 +37,18 @@ def extract_paths(svg_content):
     updated_svg = ET.tostring(root, encoding='unicode', method='xml', pretty_print=True)
     return updated_svg, paths
 
+
 @app.route('/')
 def index():
     # Read the default SVG file
-    default_svg_path = os.path.join(app.static_folder, 'svg', 'default.svg')
+    default_svg_path = os.path.join(app.static_folder, 'svg', 'undraw_sticky-note.svg')
     try:
         with open(default_svg_path, 'r') as f:
             default_svg = f.read()
     except FileNotFoundError:
         default_svg = ''  # If file not found, set default SVG to empty
     return render_template('index.html', default_svg=default_svg)
+
 
 @app.route('/process-svg', methods=['POST'])
 def process_svg():
@@ -57,6 +60,7 @@ def process_svg():
         return jsonify({'paths': paths, 'updated_svg': updated_svg})
     except ET.XMLSyntaxError as e:
         return f"Error parsing SVG: {e}", 400
+
 
 @app.route('/reverse-paths', methods=['POST'])
 def reverse_paths():
@@ -86,5 +90,7 @@ def reverse_paths():
 
     return jsonify({'updated_svg': updated_svg})
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    # use different port for development
+    app.run(debug=True, port=5001)
