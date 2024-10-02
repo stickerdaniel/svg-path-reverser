@@ -34,7 +34,8 @@
         Paste your SVG code, toggle the paths, and get the updated SVG with reversed paths.
         <br>
         Why would you need this? When animating SVG paths using the <u><a
-            href="https://css-tricks.com/svg-line-animation-works/" target="_blank">dash-offset technique</a></u>, you might
+            href="https://css-tricks.com/svg-line-animation-works/" target="_blank">dash-offset technique</a></u>, you
+        might
         want to animate the path in the opposite direction.
     </p>
 
@@ -45,7 +46,7 @@
     <div class="flex mt-3 mb-6">
         <button id="parse-btn" class="btn btn-primary rounded-full">
             <!-- SVG Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" height="24px" viewBox="0 0 24 24" width="24px"
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                  fill="currentColor">
                 <path d="M0 0h24v24H0z" fill="none"/>
                 <path d="M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 2.44-2.44 2.12 2.12-2.44 2.44z"/>
@@ -70,7 +71,8 @@
         <div class="grow flex flex-col justify-between">
             <h2 class="text-2xl font-semibold mb-3">SVG Preview</h2>
             <!-- SVG Preview -->
-            <div id="svg-preview" class="flex min-w-fit container-outline p-2 h-full min-h-48 justify-center items-center">
+            <div id="svg-preview"
+                 class="flex min-w-fit container-outline p-2 h-full min-h-48 justify-center items-center">
                 <!-- SVG is going to be rendered here -->
             </div>
         </div>
@@ -78,8 +80,23 @@
 
     <!-- Updated SVG Code -->
     <div id="updated-svg-container" style="display: none;">
-        <div class="flex justify-end mb-3 mt-6">
-            <button id="copy-btn" class="btn btn-secondary rounded-full">Copy Updated SVG</button>
+        <div class="flex justify-end mb-3 mt-6 gap-2 flex-wrap">
+            <!-- Download Animation script -->
+            <button id="download-btn" class="btn btn-secondary rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                     fill="currentColor">
+                    <path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
+                </svg>
+                Download Animation
+            </button>
+            <!-- Copy to Clipboard Button -->
+            <button id="copy-btn" class="btn btn-secondary rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                     fill="currentColor">
+                    <path d="M 360.0,-320.0 L 360.0,-800.0 L 360.0,-320.0 M 200.0,-80.0 L 640.0,-80.0 L 640.0,-160.0 L 200.0,-160.0 L 200.0,-720.0 L 120.0,-720.0 L 120.0,-160.0 Q 120.0,-127.0 143.5,-103.5 Q 167.0,-80.0 200.0,-80.0 M 360.0,-320.0 L 360.0,-800.0 L 720.0,-800.0 L 720.0,-320.0 L 360.0,-320.0 M 360.0,-240.0 L 720.0,-240.0 Q 753.0,-240.0 776.5,-263.5 Q 800.0,-287.0 800.0,-320.0 L 800.0,-800.0 Q 800.0,-833.0 776.5,-856.5 Q 753.0,-880.0 720.0,-880.0 L 360.0,-880.0 Q 327.0,-880.0 303.5,-856.5 Q 280.0,-833.0 280.0,-800.0 L 280.0,-320.0 Q 280.0,-287.0 303.5,-263.5 Q 327.0,-240.0 360.0,-240.0"/>
+                </svg>
+                Copy Updated SVG
+            </button>
         </div>
         <!-- Result Editor -->
         <div class="svg-editor-container container-outline">
