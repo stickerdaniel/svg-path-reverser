@@ -163,6 +163,21 @@ $('#copy-btn').on('click', function() {
         alert('Failed to copy SVG');
     });
 });
+// download animation button that will download the anim.mjs file #TODO implement this in html
+$('#download-btn').on('click', function() {
+    // Create a link element
+    const link = document.createElement('a');
+    // Set the URL for the static `anim.mjs` file
+    link.href = './static/js/anim.mjs';
+    // Set the download attribute to specify the file name
+    link.download = 'anim.mjs';
+    // Append the link to the document body (required for Firefox)
+    document.body.appendChild(link);
+    // Programmatically click the link to trigger the download
+    link.click();
+    // Remove the link after the download is triggered
+    document.body.removeChild(link);
+});
 
 // event listeners for animation buttons to animate the SVG paths
 $('#animate-original').on('click', function() {
