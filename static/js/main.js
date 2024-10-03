@@ -1,3 +1,5 @@
+// main.js
+
 // Initialize Ace Editor for the input
 let editor = ace.edit("input-editor");
 editor.setTheme("ace/theme/clouds"); // Light theme
@@ -163,20 +165,32 @@ $('#copy-btn').on('click', function() {
         alert('Failed to copy SVG');
     });
 });
-// download animation button that will download the anim.mjs file #TODO implement this in html
+
 $('#download-btn').on('click', function() {
-    // Create a link element
-    const link = document.createElement('a');
-    // Set the URL for the static `anim.mjs` file
-    link.href = './static/js/anim.mjs';
-    // Set the download attribute to specify the file name
-    link.download = 'anim.mjs';
-    // Append the link to the document body (required for Firefox)
-    document.body.appendChild(link);
-    // Programmatically click the link to trigger the download
-    link.click();
-    // Remove the link after the download is triggered
-    document.body.removeChild(link);
+    const modifiedSvg = resultEditor.getValue();  // Get the modified SVG from the editor
+
+    // Make an AJAX request to the server to download the zip file
+    $.ajax({
+        url: '/download-animation',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ svg_code: modifiedSvg }),  // Send the modified SVG to the server
+        xhrFields: {
+            responseType: 'blob'  // Expect the response to be a binary file (zip)
+        },
+        success: function(blob) {
+            // Create a temporary link element to trigger the download
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);  // Create a URL for the blob
+            link.download = 'animation.zip';  // Specify the filename
+            document.body.appendChild(link);
+            link.click();  // Programmatically click the link to trigger the download
+            document.body.removeChild(link);  // Clean up after download
+        },
+        error: function(xhr) {
+            alert('Error downloading the animation zip');
+        }
+    });
 });
 
 // event listeners for animation buttons to animate the SVG paths

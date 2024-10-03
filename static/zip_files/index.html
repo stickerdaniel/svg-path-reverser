@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        svg {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<!-- SVG_PLACEHOLDER -->
+
+<!-- Load GSAP library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<!-- Include anim.mjs -->
+<script src="./anim.mjs"></script>
+
+<script>
+    // Now the animateSVGPaths function will be available globally
+    window.onload = function() {
+        const svgElement = document.querySelector('svg');
+        animateSVGPaths(svgElement, 2);
+    };
+</script>
+</body>
+</html>
