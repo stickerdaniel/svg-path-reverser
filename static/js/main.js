@@ -1,5 +1,3 @@
-// main.js
-
 // Initialize Ace Editor for the input
 let editor = ace.edit("input-editor");
 editor.setTheme("ace/theme/clouds"); // Light theme
@@ -26,7 +24,7 @@ $('#parse-btn').on('click', function() {
 
     // Check if the SVG code is empty
     if (svgCode.trim() === "") {
-        alert("Please enter an SVG code!");
+        showSwal('No SVG code', 'Please enter an SVG code!', false);
         return;
     }
     originalSvg = svgCode;
@@ -42,7 +40,7 @@ $('#parse-btn').on('click', function() {
 
             // Check if any paths are found in the SVG
             if (data.length === 0) {
-                alert("No paths found in the SVG!");
+                showSwal('No Paths Found', 'No paths found in the SVG!', false);
                 showResultUI(false);
                 return;
             }
@@ -90,7 +88,7 @@ $('#parse-btn').on('click', function() {
             $('#svg-preview').html(originalSvg);
         },
         error: function(xhr) {
-            alert("Error: " + xhr.responseText);
+            showSwal('Error', 'Error parsing the SVG!\n' + xhr.responseText, false);
         }
     });
 });
@@ -139,7 +137,7 @@ function updateSvgWithReversedPaths() {
             elm.style.height = elm.offsetHeight - 1 + 'px';
         },
         error: function(xhr) {
-            alert("Error: " + xhr.responseText);
+            showSwal('Error', 'Error updating the SVG with reversed paths!\n' + xhr.responseText, false);
         }
     });
 }
@@ -160,9 +158,9 @@ function showResultUI(show) {
 // event listener for copy button to copy the updated SVG to clipboard
 $('#copy-btn').on('click', function() {
     navigator.clipboard.writeText(modifiedSvg).then(function() {
-        alert('Updated SVG copied to clipboard!');
+        showSwal('Copied!', 'Updated SVG copied to clipboard!', true);
     }, function() {
-        alert('Failed to copy SVG');
+        showSwal('Copy Failed', 'Failed to copy the updated SVG!', false);
     });
 });
 
@@ -186,9 +184,11 @@ $('#download-btn').on('click', function() {
             document.body.appendChild(link);
             link.click();  // Programmatically click the link to trigger the download
             document.body.removeChild(link);  // Clean up after download
+
+            showSwal('Download Complete', 'The animation.zip has been downloaded successfully!', true);
         },
         error: function(xhr) {
-            alert('Error downloading the animation zip');
+            showSwal('Download Failed', 'Error downloading the animation zip!\n' + xhr.responseText, false);
         }
     });
 });
@@ -208,3 +208,19 @@ $('#animate-reverted').on('click', function() {
     let svgElement = $('#svg-preview svg')[0];
     animateSVGPaths(svgElement, 1); // Animate over 2 seconds
 });
+
+// sweetalert2 configuration
+function showSwal(title, text, success) {
+    Swal.fire({
+        icon: success ? 'success' : 'error',
+        title: title,
+        text: text,
+        confirmButtonText: 'OK',
+        buttonsStyling: false,
+        customClass: {
+            confirmButton: 'btn btn-primary px-6', // Apply DaisyUI button styles
+            popup: 'rounded-box',
+        },
+    });
+}
+

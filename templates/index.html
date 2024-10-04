@@ -66,8 +66,8 @@
             <!-- Animate SVG -->
             <h2 class="text-2xl font-semibold mb-3">Animate</h2>
             <div class="flex flex-row gap-2 mb-auto">
-                <button id="animate-original" class="btn btn-accent rounded-full">Original</button>
-                <button id="animate-reverted" class="btn btn-accent rounded-full">Reversed</button>
+                <button id="animate-original" class="btn btn-accent rounded-full px-6">Original</button>
+                <button id="animate-reverted" class="btn btn-accent rounded-full px-6">Reversed</button>
             </div>
         </div>
         <div class="grow flex flex-col justify-between">
@@ -118,6 +118,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Ace Editor -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Custom Scripts -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/anim.mjs') }}"></script>
