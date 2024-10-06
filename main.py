@@ -45,7 +45,7 @@ def extract_paths(svg_content):
 @app.route('/')
 def index():
     # Read the default SVG file
-    default_svg_path = os.path.join(app.static_folder, 'svg', 'undraw_sticky-note.svg')
+    default_svg_path = os.path.join(app.static_folder, 'svg', 'hello.svg')
     try:
         with open(default_svg_path, 'r') as f:
             default_svg = f.read()

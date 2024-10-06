@@ -38,8 +38,8 @@ function animatePath(path, duration) {
 
     // Set initial styles for animation
     gsap.set(path, {
-        strokeDasharray: totalLength+1,
-        strokeDashoffset: totalLength+2,
+        strokeDasharray: totalLength+2,
+        strokeDashoffset: totalLength+3,
     });
     // Animate the stroke
     gsap.to(path, {

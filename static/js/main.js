@@ -199,14 +199,14 @@ $('#animate-original').on('click', function() {
     $('#svg-preview').html(originalSvg);
     // Animate the paths
     let svgElement = $('#svg-preview svg')[0];
-    animateSVGPaths(svgElement, 1); // Animate over 2 seconds
+    animateSVGPaths(svgElement, 2); // Animate over 2 seconds
 });
 $('#animate-reverted').on('click', function() {
     // Display the modified SVG
     $('#svg-preview').html(modifiedSvg);
     // Animate the paths
     let svgElement = $('#svg-preview svg')[0];
-    animateSVGPaths(svgElement, 1); // Animate over 2 seconds
+    animateSVGPaths(svgElement, 2); // Animate over 2 seconds
 });
 
 // sweetalert2 configuration
