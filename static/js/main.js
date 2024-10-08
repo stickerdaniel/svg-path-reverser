@@ -19,7 +19,7 @@ let reversedPaths = [];
 let originalSvg = '';
 let modifiedSvg = '';
 
-$('#parse-btn').on('click', function() {
+$('#parse-btn').on('click', function () {
     const svgCode = editor.getValue();
 
     // Check if the SVG code is empty
@@ -29,10 +29,7 @@ $('#parse-btn').on('click', function() {
     }
     originalSvg = svgCode;
     $.ajax({
-        url: '/process-svg',
-        type: 'POST',
-        data: { svg_code: svgCode },
-        success: function(response) {
+        url: '/process-svg', type: 'POST', data: {svg_code: svgCode}, success: function (response) {
             const data = response.paths;
             originalSvg = response.updated_svg;
             $('#path-list').empty();
@@ -47,11 +44,13 @@ $('#parse-btn').on('click', function() {
 
             showResultUI(true);
 
-            data.forEach(function(path, index) {
+            data.forEach(function (path, index) {
                 const checkbox = `<input type="checkbox" id="path${index}" value="${index}" class="checkbox" checked>`;
                 const statusBadge = `<span id="status${index}" class="badge badge-success m-1">reversed</span>`;
                 let pathIdBadge = '';
                 let pathClassBadge = '';
+                const animationDurationInput = `<div class="tooltip" data-tip="duration"><input type="text" placeholder="2s" class="input input-bordered input-accent input-xs w-10 text-center m-1" /></div>`;
+                const animationDelayInput = `<div class="tooltip" data-tip="delay"><input type="text" placeholder="0s" class="input input-bordered input-accent input-xs w-10 text-center m-1" /></div>`;
                 // id badge
                 if (path.id) {
                     pathIdBadge = `<span class="badge badge-secondary mx-1">#${path.id}</span>`;
@@ -67,10 +66,13 @@ $('#parse-btn').on('click', function() {
                     <div class="path-item flex items-center">
                         ${checkbox}
                         ${statusBadge}
-                        <div class="flex items-center mx-4">
+                        <div class="flex items-center ml-4 w-full">
                             ${pathIdBadge}
                             ${pathClassBadge}
                             ${startBadge}
+                            <div class="grow"></div>
+                            ${animationDurationInput}
+                            ${animationDelayInput}
                         </div>
                     </div>
                 `);
@@ -86,14 +88,13 @@ $('#parse-btn').on('click', function() {
 
             // Render the original SVG in the preview
             $('#svg-preview').html(originalSvg);
-        },
-        error: function(xhr) {
+        }, error: function (xhr) {
             showSwal('Error', 'Error parsing the SVG!\n' + xhr.responseText, false);
         }
     });
 });
 
-$(document).on('change', '#path-list input:checkbox', function() {
+$(document).on('change', '#path-list input:checkbox', function () {
     const pathIndex = parseInt($(this).val(), 10);
     const isChecked = $(this).is(':checked');
     const index = $(this).attr('id').replace('path', '');
@@ -121,8 +122,8 @@ function updateSvgWithReversedPaths() {
         url: '/reverse-paths',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ svg_code: originalSvg, paths_to_reverse: reversedPaths }),
-        success: function(data) {
+        data: JSON.stringify({svg_code: originalSvg, paths_to_reverse: reversedPaths}),
+        success: function (data) {
             modifiedSvg = data.updated_svg;
 
             // Update the result editor
@@ -136,7 +137,7 @@ function updateSvgWithReversedPaths() {
             elm.style.height = elm.offsetHeight + 1 + 'px';
             elm.style.height = elm.offsetHeight - 1 + 'px';
         },
-        error: function(xhr) {
+        error: function (xhr) {
             showSwal('Error', 'Error updating the SVG with reversed paths!\n' + xhr.responseText, false);
         }
     });
@@ -156,15 +157,15 @@ function showResultUI(show) {
 }
 
 // event listener for copy button to copy the updated SVG to clipboard
-$('#copy-btn').on('click', function() {
-    navigator.clipboard.writeText(modifiedSvg).then(function() {
+$('#copy-btn').on('click', function () {
+    navigator.clipboard.writeText(modifiedSvg).then(function () {
         showSwal('Copied!', 'Updated SVG copied to clipboard!', true);
-    }, function() {
+    }, function () {
         showSwal('Copy Failed', 'Failed to copy the updated SVG!', false);
     });
 });
 
-$('#download-btn').on('click', function() {
+$('#download-btn').on('click', function () {
     const modifiedSvg = resultEditor.getValue();  // Get the modified SVG from the editor
 
     // Make an AJAX request to the server to download the zip file
@@ -172,11 +173,11 @@ $('#download-btn').on('click', function() {
         url: '/download-animation',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ svg_code: modifiedSvg }),  // Send the modified SVG to the server
+        data: JSON.stringify({svg_code: modifiedSvg}),  // Send the modified SVG to the server
         xhrFields: {
             responseType: 'blob'  // Expect the response to be a binary file (zip)
         },
-        success: function(blob) {
+        success: function (blob) {
             // Create a temporary link element to trigger the download
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);  // Create a URL for the blob
@@ -187,21 +188,21 @@ $('#download-btn').on('click', function() {
 
             showSwal('Download Complete', 'The animation.zip has been downloaded successfully!', true);
         },
-        error: function(xhr) {
+        error: function (xhr) {
             showSwal('Download Failed', 'Error downloading the animation zip!\n' + xhr.responseText, false);
         }
     });
 });
 
 // event listeners for animation buttons to animate the SVG paths
-$('#animate-original').on('click', function() {
+$('#animate-original').on('click', function () {
     // Display the original SVG
     $('#svg-preview').html(originalSvg);
     // Animate the paths
     let svgElement = $('#svg-preview svg')[0];
     animateSVGPaths(svgElement, 2); // Animate over 2 seconds
 });
-$('#animate-reverted').on('click', function() {
+$('#animate-reverted').on('click', function () {
     // Display the modified SVG
     $('#svg-preview').html(modifiedSvg);
     // Animate the paths

@@ -58,17 +58,24 @@
     </div>
 
     <!-- Paths List and SVG Rendering -->
-    <div id="settings" class="flex flex-col lg:flex-row mt-6" style="display: none;">
+    <div id="settings" class="flex flex-col lg:flex-row mt-6 gap-2" style="display: none;">
         <div class="flex flex-col mb-6">
             <!-- Paths List -->
             <h2 class="text-2xl font-semibold mb-3">Paths</h2>
             <div id="path-list" class="mb-6"></div>
             <!-- Animate SVG -->
             <h2 class="text-2xl font-semibold mb-3">Animate</h2>
-            <div class="flex flex-row gap-2 mb-auto">
+            <div class="flex flex-row gap-2 pb-3">
                 <button id="animate-original" class="btn btn-accent rounded-full px-6">Original</button>
                 <button id="animate-reverted" class="btn btn-accent rounded-full px-6">Reversed</button>
             </div>
+            <!-- subheading smaller as animation heading -->
+            <div class="flex flex-row items-center gap-2 mb-auto">
+                <input type="range" min="0" max="200" value="100" class="range flex-grow range-accent" />
+                <!-- Badge to show the current value of the range in seconds -->
+                <span id="range-value" class="badge badge-lg badge-accent">100%</span>
+            </div>
+
         </div>
         <div class="grow flex flex-col justify-between">
             <h2 class="text-2xl font-semibold mb-3">SVG Preview</h2>
