@@ -19,6 +19,9 @@ let reversedPaths = [];
 let originalSvg = '';
 let modifiedSvg = '';
 
+// Variable to store the animation scale
+let animationScale = 1; // Default scale
+
 $('#parse-btn').on('click', function () {
     const svgCode = editor.getValue();
 
@@ -49,15 +52,24 @@ $('#parse-btn').on('click', function () {
                 const statusBadge = `<span id="status${index}" class="badge badge-success m-1">reversed</span>`;
                 let pathIdBadge = '';
                 let pathClassBadge = '';
-                const animationDurationInput = `<div class="tooltip" data-tip="duration"><input type="text" placeholder="2s" class="input input-bordered input-accent input-xs w-10 text-center m-1" /></div>`;
-                const animationDelayInput = `<div class="tooltip" data-tip="delay"><input type="text" placeholder="0s" class="input input-bordered input-accent input-xs w-10 text-center m-1" /></div>`;
+                // Get duration and delay from path
+                let durationValue = path.duration || '';
+                let delayValue = path.delay || '';
+                const animationDurationInput = `<div class="tooltip" data-tip="duration"><input type="text" value="${durationValue}" placeholder="2" class="input-duration input input-bordered input-accent input-xs w-10 text-center m-1" /></div>`;
+                const animationDelayInput = `<div class="tooltip" data-tip="delay"><input type="text" value="${delayValue}" placeholder="0" class="input-delay input input-bordered input-accent input-xs w-10 text-center m-1" /></div>`;
                 // id badge
                 if (path.id) {
                     pathIdBadge = `<span class="badge badge-secondary mx-1">#${path.id}</span>`;
                 }
                 // class badge
                 if (path.class) {
-                    pathClassBadge = `<span class="badge badge-primary mx-1">${path.class}</span>`;
+                    // Filter out 'duration-*', 'delay-*', and 'animate' classes
+                    let filteredClasses = path.class.split(' ').filter(cls => {
+                        return !cls.startsWith('duration-') && !cls.startsWith('delay-') && cls !== 'animate';
+                    }).join(' ');
+                    if (filteredClasses) {
+                        pathClassBadge = `<span class="badge badge-primary mx-1">${filteredClasses}</span>`;
+                    }
                 }
                 // start value badge
                 let startValue = path.start ? `${path.start}` : 'N/A';
@@ -118,11 +130,27 @@ $(document).on('change', '#path-list input:checkbox', function () {
 
 // Function to update the SVG with the reversed paths
 function updateSvgWithReversedPaths() {
+    // Collect duration and delay values
+    let pathData = [];
+    $('#path-list .path-item').each(function(index) {
+        let duration = $(this).find('.input-duration').val();
+        let delay = $(this).find('.input-delay').val();
+        pathData.push({
+            index: index,
+            duration: duration,
+            delay: delay
+        });
+    });
+
     $.ajax({
         url: '/reverse-paths',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({svg_code: originalSvg, paths_to_reverse: reversedPaths}),
+        data: JSON.stringify({
+            svg_code: originalSvg,
+            paths_to_reverse: reversedPaths,
+            path_data: pathData  // Send duration and delay values
+        }),
         success: function (data) {
             modifiedSvg = data.updated_svg;
 
@@ -200,14 +228,14 @@ $('#animate-original').on('click', function () {
     $('#svg-preview').html(originalSvg);
     // Animate the paths
     let svgElement = $('#svg-preview svg')[0];
-    animateSVGPaths(svgElement, 2); // Animate over 2 seconds
+    animateSVGPaths(svgElement, animationScale);
 });
-$('#animate-reverted').on('click', function () {
+$('#animate-edited').on('click', function () {
     // Display the modified SVG
     $('#svg-preview').html(modifiedSvg);
     // Animate the paths
     let svgElement = $('#svg-preview svg')[0];
-    animateSVGPaths(svgElement, 2); // Animate over 2 seconds
+    animateSVGPaths(svgElement, animationScale);
 });
 
 // sweetalert2 configuration
@@ -225,3 +253,36 @@ function showSwal(title, text, success) {
     });
 }
 
+// Cache the necessary DOM elements
+const $speedSlider = $('#speed-slider');
+const $speedBadge = $('#speed-badge');
+const $pathList = $('#path-list');
+
+// Capture speed factor from the slider and update the badge
+$speedSlider.on('input', function() {
+    const speedPercent = parseFloat($(this).val());
+    $speedBadge.text(`${speedPercent}%`);
+    animationScale = speedPercent * 0.01;
+    // No need to update duration and delay inputs
+});
+
+// Capture inputs for duration and delay, and remove non-numeric characters
+$pathList.on('input', '.input-duration', function() {
+    let duration = $(this).val() || ''; // Allow empty string
+    // Remove any non-numeric characters
+    duration = duration.replace(/[^\d.]/g, '');
+    // Update the input field with the cleaned value
+    $(this).val(duration);
+    // Update the SVG with new duration
+    updateSvgWithReversedPaths();
+});
+
+$pathList.on('input', '.input-delay', function() {
+    let delay = $(this).val() || ''; // Allow empty string
+    // Remove any non-numeric characters
+    delay = delay.replace(/[^\d.]/g, '');
+    // Update the input field with the cleaned value
+    $(this).val(delay);
+    // Update the SVG with new delay
+    updateSvgWithReversedPaths();
+});

@@ -67,15 +67,17 @@
             <h2 class="text-2xl font-semibold mb-3">Animate</h2>
             <div class="flex flex-row gap-2 pb-3">
                 <button id="animate-original" class="btn btn-accent rounded-full px-6">Original</button>
-                <button id="animate-reverted" class="btn btn-accent rounded-full px-6">Reversed</button>
+                <button id="animate-edited" class="btn btn-accent rounded-full px-6">Edited</button>
             </div>
             <!-- subheading smaller as animation heading -->
+            <div class="tooltip tooltip-bottom flex-grow" data-tip="Adjust animation time scale">
             <div class="flex flex-row items-center gap-2 mb-auto">
-                <input type="range" min="0" max="200" value="100" class="range flex-grow range-accent" />
+                    <input id="speed-slider" type="range" min="10" max="200" value="100" step="10"
+                           class="range range-accent"/>
                 <!-- Badge to show the current value of the range in seconds -->
-                <span id="range-value" class="badge badge-lg badge-accent">100%</span>
+                <span id="speed-badge" class="badge badge-lg badge-accent" style="width: 4rem">100%</span>
             </div>
-
+            </div>
         </div>
         <div class="grow flex flex-col justify-between">
             <h2 class="text-2xl font-semibold mb-3">SVG Preview</h2>

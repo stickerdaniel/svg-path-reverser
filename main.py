@@ -1,5 +1,3 @@
-# main.py
-
 from flask import Flask, render_template, request, jsonify, send_file
 from svgpathtools import parse_path
 import lxml.etree as et
@@ -35,7 +33,26 @@ def extract_paths(svg_content):
         if path_id:
             path_info['id'] = path_id
         if path_class:
-            path_info['class'] = path_class
+            # Remove 'duration-*', 'delay-*', and 'animate' classes from display
+            class_list = [cls for cls in path_class.split() if not (cls.startswith('duration-') or cls.startswith('delay-') or cls == 'animate')]
+            if class_list:
+                path_info['class'] = ' '.join(class_list)
+            # Parse duration and delay from classes
+            duration = None
+            delay = None
+            for cls in path_class.split():
+                if cls.startswith('duration-'):
+                    duration_value = cls[len('duration-'):]
+                    duration_value = duration_value.replace('_', '.')
+                    duration = duration_value
+                elif cls.startswith('delay-'):
+                    delay_value = cls[len('delay-'):]
+                    delay_value = delay_value.replace('_', '.')
+                    delay = delay_value
+            if duration:
+                path_info['duration'] = duration
+            if delay:
+                path_info['delay'] = delay
         paths.append(path_info)
     # Return the SVG string and paths
     updated_svg = et.tostring(root, encoding='unicode', method='xml', pretty_print=True)
@@ -70,9 +87,13 @@ def process_svg():
 def reverse_paths():
     svg_content = request.json['svg_code']
     paths_to_reverse = request.json['paths_to_reverse']
+    path_data = request.json.get('path_data', [])
 
     # Convert paths_to_reverse to integers (indexes)
     paths_to_reverse = [int(idx) for idx in paths_to_reverse]
+
+    # Create a mapping from index to duration and delay
+    path_data_dict = {int(item['index']): {'duration': item.get('duration'), 'delay': item.get('delay')} for item in path_data}
 
     # Parse the SVG content
     parser = et.XMLParser(recover=True)
@@ -88,6 +109,32 @@ def reverse_paths():
             path_object = parse_path(d_attr)
             reversed_path = path_object.reversed().d()
             path.set('d', reversed_path)  # Set the reversed path back to the SVG
+
+        # Update the class attribute to include duration and delay classes
+        classes = path.attrib.get('class', '').split()
+        # Remove existing duration-*, delay-*, and animate classes
+        classes = [cls for cls in classes if not (cls.startswith('duration-') or cls.startswith('delay-'))]
+        # Get duration and delay from path_data_dict
+        duration = path_data_dict.get(idx, {}).get('duration')
+        delay = path_data_dict.get(idx, {}).get('delay')
+        # If duration is provided
+        if duration:
+            duration_class_value = duration.replace('.', '_')
+            duration_class = f'duration-{duration_class_value}'
+            classes.append(duration_class)
+            # 'animate' class is not added as per your request
+        # If delay is provided
+        if delay:
+            delay_class_value = delay.replace('.', '_')
+            delay_class = f'delay-{delay_class_value}'
+            classes.append(delay_class)
+        # Update the class attribute
+        if classes:
+            path.attrib['class'] = ' '.join(classes)
+        else:
+            # Remove class attribute if empty
+            if 'class' in path.attrib:
+                del path.attrib['class']
 
     # Convert the updated XML back to string format
     updated_svg = et.tostring(root, encoding='unicode', method='xml', pretty_print=True)
