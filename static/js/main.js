@@ -22,6 +22,24 @@ let modifiedSvg = '';
 // Variable to store the animation scale
 let animationScale = 1; // Default scale
 
+// Define arrays for easing functions and types
+const easingFunctions = [
+    'linear',
+    'power1',
+    'power2',
+    'power3',
+    'power4',
+    'back',
+    'bounce',
+    'circ',
+    'elastic',
+    'expo',
+    'sine',
+    'steps'
+];
+
+const easingTypes = ['.in', '.out', '.inOut'];
+
 $('#parse-btn').on('click', function () {
     const svgCode = editor.getValue();
 
@@ -57,6 +75,7 @@ $('#parse-btn').on('click', function () {
                 let delayValue = path.delay || '';
                 const animationDurationInput = `<div class="tooltip" data-tip="duration"><input type="text" value="${durationValue}" placeholder="2" class="input-duration input input-bordered input-accent input-xs w-10 text-center m-1" /></div>`;
                 const animationDelayInput = `<div class="tooltip" data-tip="delay"><input type="text" value="${delayValue}" placeholder="0" class="input-delay input input-bordered input-accent input-xs w-10 text-center m-1" /></div>`;
+
                 // id badge
                 if (path.id) {
                     pathIdBadge = `<span class="badge badge-secondary mx-1">#${path.id}</span>`;
@@ -68,12 +87,49 @@ $('#parse-btn').on('click', function () {
                         return !cls.startsWith('duration-') && !cls.startsWith('delay-') && cls !== 'animate';
                     }).join(' ');
                     if (filteredClasses) {
-                        pathClassBadge = `<span class="badge badge-primary mx-1">${filteredClasses}</span>`;
+                        pathClassBadge = `<span class="badge badge-primary mx-1 whitespace-nowrap">${filteredClasses}</span>`;
                     }
                 }
                 // start value badge
                 let startValue = path.start ? `${path.start}` : 'N/A';
                 const startBadge = `<span class="badge badge-info mx-2 text-nowrap">${startValue}...</span>`;
+
+                // Get easing from path
+                let easingValue = path.easing || '';
+                let easingFunction = '';
+                let easingType = '';
+                if (easingValue) {
+                    let parts = easingValue.split('.');
+                    easingFunction = parts[0]; // e.g., 'power2'
+                    easingType = parts[1] ? '.' + parts[1] : ''; // e.g., '.out'
+                }
+
+                // Create easing function options
+                function createEasingFunctionOptions(selectedFunction) {
+                    return easingFunctions.map(function (easeFunc) {
+                        let selected = (easeFunc === selectedFunction || (!selectedFunction && easeFunc === 'power1')) ? 'selected' : '';
+                        return `<option value="${easeFunc}" ${selected}>${easeFunc}</option>`;
+                    }).join('');
+                }
+
+                // Create easing type options
+                function createEasingTypeOptions(selectedType) {
+                    return easingTypes.map(function (easeType) {
+                        let label = easeType.replace('.', '') || 'out'; // Default to 'out' if empty
+                        let selected = (easeType === selectedType || (!selectedType && easeType === '.out')) ? 'selected' : '';
+                        return `<option value="${easeType}" ${selected}>${label}</option>`;
+                    }).join('');
+                }
+
+                const easingFunctionSelect = `<div class="tooltip" data-tip="easing function"><select class="select-easing-function select select-accent select-xs m-1">
+                ${createEasingFunctionOptions(easingFunction)}
+                </select></div>`;
+
+                const easingTypeSelect = `<div class="tooltip" data-tip="easing type"><select class="select-easing-type select select-accent select-xs m-1">
+                ${createEasingTypeOptions(easingType)}
+                </select></div>`;
+
+                // Append the path item with the new selects
                 $('#path-list').append(`
                     <div class="path-item flex items-center">
                         ${checkbox}
@@ -85,9 +141,12 @@ $('#parse-btn').on('click', function () {
                             <div class="grow"></div>
                             ${animationDurationInput}
                             ${animationDelayInput}
+                            ${easingFunctionSelect}
+                            ${easingTypeSelect}
                         </div>
                     </div>
                 `);
+
                 // Add path index to reversedPaths
                 reversedPaths.push(index);
             });
@@ -130,15 +189,25 @@ $(document).on('change', '#path-list input:checkbox', function () {
 
 // Function to update the SVG with the reversed paths
 function updateSvgWithReversedPaths() {
-    // Collect duration and delay values
+    // Collect duration, delay, and easing values
     let pathData = [];
     $('#path-list .path-item').each(function(index) {
         let duration = $(this).find('.input-duration').val();
         let delay = $(this).find('.input-delay').val();
+        let easingFunction = $(this).find('.select-easing-function').val();
+        let easingType = $(this).find('.select-easing-type').val();
+        let easing = '';
+        if (easingFunction) {
+            easing = easingFunction;
+            if (easingType) {
+                easing += easingType;
+            }
+        }
         pathData.push({
             index: index,
             duration: duration,
-            delay: delay
+            delay: delay,
+            easing: easing
         });
     });
 
@@ -149,7 +218,7 @@ function updateSvgWithReversedPaths() {
         data: JSON.stringify({
             svg_code: originalSvg,
             paths_to_reverse: reversedPaths,
-            path_data: pathData  // Send duration and delay values
+            path_data: pathData  // Send duration, delay, and easing data
         }),
         success: function (data) {
             modifiedSvg = data.updated_svg;
@@ -259,7 +328,7 @@ const $speedBadge = $('#speed-badge');
 const $pathList = $('#path-list');
 
 // Capture speed factor from the slider and update the badge
-$speedSlider.on('input', function() {
+$speedSlider.on('input', function () {
     const speedPercent = parseFloat($(this).val());
     $speedBadge.text(`${speedPercent}%`);
     animationScale = speedPercent * 0.01;
@@ -267,7 +336,7 @@ $speedSlider.on('input', function() {
 });
 
 // Capture inputs for duration and delay, and remove non-numeric characters
-$pathList.on('input', '.input-duration', function() {
+$pathList.on('input', '.input-duration', function () {
     let duration = $(this).val() || ''; // Allow empty string
     // Remove any non-numeric characters
     duration = duration.replace(/[^\d.]/g, '');
@@ -277,12 +346,21 @@ $pathList.on('input', '.input-duration', function() {
     updateSvgWithReversedPaths();
 });
 
-$pathList.on('input', '.input-delay', function() {
+$pathList.on('input', '.input-delay', function () {
     let delay = $(this).val() || ''; // Allow empty string
     // Remove any non-numeric characters
     delay = delay.replace(/[^\d.]/g, '');
     // Update the input field with the cleaned value
     $(this).val(delay);
     // Update the SVG with new delay
+    updateSvgWithReversedPaths();
+});
+
+// Event listeners for easing function and type selects
+$pathList.on('change', '.select-easing-function', function() {
+    updateSvgWithReversedPaths();
+});
+
+$pathList.on('change', '.select-easing-type', function() {
     updateSvgWithReversedPaths();
 });

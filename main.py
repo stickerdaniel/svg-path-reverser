@@ -21,7 +21,7 @@ def extract_paths(svg_content):
     for idx, path in enumerate(all_paths):
         d_attr = path.attrib.get('d')
         path_id = path.attrib.get('id')
-        path_class = path.attrib.get('class')
+        path_class = path.attrib.get('class', '')
         start_point = parse_path(d_attr).point(0) if d_attr else None
         start_point_str = f"({start_point.real:.6f}, {start_point.imag:.6f})" if start_point else 'N/A'
         path_info = {
@@ -32,27 +32,30 @@ def extract_paths(svg_content):
         }
         if path_id:
             path_info['id'] = path_id
-        if path_class:
-            # Remove 'duration-*', 'delay-*', and 'animate' classes from display
-            class_list = [cls for cls in path_class.split() if not (cls.startswith('duration-') or cls.startswith('delay-') or cls == 'animate')]
-            if class_list:
-                path_info['class'] = ' '.join(class_list)
-            # Parse duration and delay from classes
-            duration = None
-            delay = None
-            for cls in path_class.split():
-                if cls.startswith('duration-'):
-                    duration_value = cls[len('duration-'):]
-                    duration_value = duration_value.replace('_', '.')
-                    duration = duration_value
-                elif cls.startswith('delay-'):
-                    delay_value = cls[len('delay-'):]
-                    delay_value = delay_value.replace('_', '.')
-                    delay = delay_value
-            if duration:
-                path_info['duration'] = duration
-            if delay:
-                path_info['delay'] = delay
+        # Remove 'duration-*', 'delay-*', and 'ease-*' classes from display
+        class_list = [cls for cls in path_class.split() if not (cls.startswith('duration-') or cls.startswith('delay-') or cls.startswith('ease-'))]
+        if class_list:
+            path_info['class'] = ' '.join(class_list)
+        # Parse duration, delay, and easing from classes
+        duration = None
+        delay = None
+        easing = None
+        for cls in path_class.split():
+            if cls.startswith('duration-'):
+                duration_value = cls[len('duration-'):].replace('_', '.')
+                duration = duration_value
+            elif cls.startswith('delay-'):
+                delay_value = cls[len('delay-'):].replace('_', '.')
+                delay = delay_value
+            elif cls.startswith('ease-'):
+                easing_value = cls[len('ease-'):].replace('_', '.')
+                easing = easing_value
+        if duration:
+            path_info['duration'] = duration
+        if delay:
+            path_info['delay'] = delay
+        if easing:
+            path_info['easing'] = easing
         paths.append(path_info)
     # Return the SVG string and paths
     updated_svg = et.tostring(root, encoding='unicode', method='xml', pretty_print=True)
@@ -92,8 +95,10 @@ def reverse_paths():
     # Convert paths_to_reverse to integers (indexes)
     paths_to_reverse = [int(idx) for idx in paths_to_reverse]
 
-    # Create a mapping from index to duration and delay
-    path_data_dict = {int(item['index']): {'duration': item.get('duration'), 'delay': item.get('delay')} for item in path_data}
+    # Create a mapping from index to duration, delay, and easing
+    path_data_dict = {int(item['index']): {'duration': item.get('duration'),
+                                           'delay': item.get('delay'),
+                                           'easing': item.get('easing')} for item in path_data}
 
     # Parse the SVG content
     parser = et.XMLParser(recover=True)
@@ -110,24 +115,29 @@ def reverse_paths():
             reversed_path = path_object.reversed().d()
             path.set('d', reversed_path)  # Set the reversed path back to the SVG
 
-        # Update the class attribute to include duration and delay classes
+        # Update the class attribute to include duration, delay, and easing classes
         classes = path.attrib.get('class', '').split()
-        # Remove existing duration-*, delay-*, and animate classes
-        classes = [cls for cls in classes if not (cls.startswith('duration-') or cls.startswith('delay-'))]
-        # Get duration and delay from path_data_dict
+        # Remove existing duration-*, delay-*, and ease-* classes
+        classes = [cls for cls in classes if not (cls.startswith('duration-') or cls.startswith('delay-') or cls.startswith('ease-'))]
+        # Get duration, delay, and easing from path_data_dict
         duration = path_data_dict.get(idx, {}).get('duration')
         delay = path_data_dict.get(idx, {}).get('delay')
+        easing = path_data_dict.get(idx, {}).get('easing')
         # If duration is provided
         if duration:
             duration_class_value = duration.replace('.', '_')
             duration_class = f'duration-{duration_class_value}'
             classes.append(duration_class)
-            # 'animate' class is not added as per your request
         # If delay is provided
         if delay:
             delay_class_value = delay.replace('.', '_')
             delay_class = f'delay-{delay_class_value}'
             classes.append(delay_class)
+        # If easing is provided
+        if easing:
+            easing_class_value = easing.replace('.', '_')
+            easing_class = f'ease-{easing_class_value}'
+            classes.append(easing_class)
         # Update the class attribute
         if classes:
             path.attrib['class'] = ' '.join(classes)
@@ -171,7 +181,7 @@ def download_animation():
     except FileNotFoundError:
         return "Error: index.html file not found", 404
 
-    # inject the modified SVG into the index.html content
+    # Inject the modified SVG into the index.html content
     index_html_content = index_html_content.replace("<!-- SVG_PLACEHOLDER -->", modified_svg)
 
     # Create the zip file and add the files
@@ -185,5 +195,5 @@ def download_animation():
 
 
 if __name__ == '__main__':
-    # use different port for development
-    app.run(debug=True, port=5001)
+    # Use different port for development
+    app.run(debug=True, port=5000)

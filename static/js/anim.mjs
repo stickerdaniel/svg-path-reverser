@@ -13,9 +13,10 @@ function animateSVGPaths(svgElement, animationScale) {
     let tl = gsap.timeline();
 
     paths.forEach(function (path) {
-        // Get duration and delay from the path's classes
-        let duration = 2; // default duration
-        let delay = 0;    // default delay
+        // Get duration, delay, and easing from the path's classes
+        let duration = 2;          // Default duration
+        let delay = 0;             // Default delay
+        let easing = 'power1.out'; // Default easing
 
         let classList = path.getAttribute('class') ? path.getAttribute('class').split(' ') : [];
 
@@ -23,15 +24,17 @@ function animateSVGPaths(svgElement, animationScale) {
             if (cls.startsWith('duration-')) {
                 let durationValue = cls.replace('duration-', '').replace('_', '.');
                 duration = parseFloat(durationValue);
-            }
-            if (cls.startsWith('delay-')) {
+            } else if (cls.startsWith('delay-')) {
                 let delayValue = cls.replace('delay-', '').replace('_', '.');
                 delay = parseFloat(delayValue);
+            } else if (cls.startsWith('ease-')) {
+                let easingValue = cls.replace('ease-', '').replace('_', '.');
+                easing = easingValue;
             }
         });
 
         // Animate the path
-        animatePath(path, tl, duration, delay);
+        animatePath(path, tl, duration, delay, easing);
     });
 
     // Apply timeScale to the timeline
@@ -39,7 +42,7 @@ function animateSVGPaths(svgElement, animationScale) {
 }
 
 // Function to animate a single SVG path using GSAP
-function animatePath(path, timeline, duration, delay) {
+function animatePath(path, timeline, duration, delay, easing) {
     const totalLength = getPathLength(path);
 
     // Ensure the user sees some effect even if the SVG is not optimized
@@ -66,6 +69,6 @@ function animatePath(path, timeline, duration, delay) {
     timeline.to(path, {
         strokeDashoffset: 0,
         duration: duration,
-        ease: "power3.out"
+        ease: easing
     }, delay); // Use delay as the position parameter
 }
