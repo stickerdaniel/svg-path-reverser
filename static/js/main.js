@@ -270,26 +270,42 @@ $('#download-btn').on('click', function () {
         url: '/download-animation',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({svg_code: modifiedSvg}),  // Send the modified SVG to the server
+        // Send the modified SVG and animation scale to the server
+        data: JSON.stringify({svg_code: modifiedSvg, animation_scale: animationScale}),
         xhrFields: {
-            responseType: 'blob'  // Expect the response to be a binary file (zip)
+            responseType: 'blob'  // Set the response type to blob
         },
-        success: function (blob) {
-            // Create a temporary link element to trigger the download
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);  // Create a URL for the blob
-            link.download = 'animation.zip';  // Specify the filename
-            document.body.appendChild(link);
-            link.click();  // Programmatically click the link to trigger the download
-            document.body.removeChild(link);  // Clean up after download
+        success: function (data, status, xhr) {
+            const contentType = xhr.getResponseHeader('Content-Type');
 
-            showSwal('Download Complete', 'The animation.zip has been downloaded successfully!', true);
+            // Handle response as a ZIP if it's binary
+            if (contentType === 'application/zip') {
+                const blob = new Blob([data], { type: 'application/zip' });
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);  // Create a URL for the blob
+                link.download = 'animation.zip';  // Specify the filename
+                document.body.appendChild(link);
+                link.click();  // Programmatically click the link to trigger the download
+                document.body.removeChild(link);  // Clean up after download
+                showSwal('Download Complete', 'The animation.zip has been downloaded successfully!', true);
+            } else if (contentType === 'text/plain') {
+                // Handle plain text error messages
+                showSwal('Download Failed', `Error: ${data}`, false);
+            }
         },
         error: function (xhr) {
-            showSwal('Download Failed', 'Error downloading the animation zip!\n' + xhr.responseText, false);
+            const contentType = xhr.getResponseHeader('Content-Type');
+
+            // Handle plain text error messages
+            if (contentType === 'text/plain') {
+                showSwal('Download Failed', `Error: ${xhr.responseText}`, false);
+            } else {
+                showSwal('Download Failed', 'An unexpected error occurred while downloading the animation zip.', false);
+            }
         }
     });
 });
+
 
 // event listeners for animation buttons to animate the SVG paths
 $('#animate-original').on('click', function () {

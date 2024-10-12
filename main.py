@@ -159,13 +159,17 @@ def download_animation():
     if not modified_svg:
         return "Error: Modified SVG not provided", 400
 
+    # Retrieve the animation scale from the request
+    animation_scale = request.json.get('animation_scale', None)
+    if not animation_scale:
+        return "Error: Animation scale not provided", 400, {'Content-Type': 'text/plain'}
+
     # Create a zip file in memory
     zip_buffer = io.BytesIO()
 
     # Paths to the static files in zip_files folder
     anim_mjs_path = os.path.join(app.static_folder, 'js', 'anim.mjs')
     index_html_path = os.path.join(app.static_folder, 'zip_files', 'index.html')
-    main_js_path = os.path.join(app.static_folder, 'zip_files', 'main.js')
 
     # Read anim.mjs
     try:
@@ -183,6 +187,7 @@ def download_animation():
 
     # Inject the modified SVG into the index.html content
     index_html_content = index_html_content.replace("<!-- SVG_PLACEHOLDER -->", modified_svg)
+    index_html_content = index_html_content.replace("const animationScale = 1;", f"const animationScale = {animation_scale};")
 
     # Create the zip file and add the files
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:

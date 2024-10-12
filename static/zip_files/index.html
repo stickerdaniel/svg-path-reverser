@@ -30,10 +30,12 @@
 <script src="./anim.mjs"></script>
 
 <script>
+    const animationScale = 1; // will be replaced with the correct value during zip creation
+
     // Now the animateSVGPaths function will be available globally
     window.onload = function() {
         const svgElement = document.querySelector('svg');
-        animateSVGPaths(svgElement, 2);
+        animateSVGPaths(svgElement, animationScale);
     };
 </script>
 </body>
