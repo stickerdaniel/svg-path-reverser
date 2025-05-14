@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Flask Dev Server",
+      "type": "shell",
+      "command": "flask run --debug",
+      "options": {
+        "env": {
+          "FLASK_APP": "main.py",
+          "FLASK_ENV": "development"
+        }
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+} 

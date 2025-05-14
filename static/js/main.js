@@ -1,13 +1,13 @@
 // Initialize Ace Editor for the input
 let editor = ace.edit("input-editor");
-editor.setTheme("ace/theme/clouds"); // Light theme
+editor.setTheme("ace/theme/dracula"); // Light theme
 editor.session.setMode("ace/mode/svg");
 editor.setValue(defaultSvg, -1); // Set initial content
 editor.renderer.setShowPrintMargin(false); // Remove the gray line
 
 // Initialize Ace Editor for the output (result)
 let resultEditor = ace.edit("output-editor");
-resultEditor.setTheme("ace/theme/clouds");
+resultEditor.setTheme("ace/theme/dracula");
 resultEditor.session.setMode("ace/mode/svg");
 resultEditor.setReadOnly(true); // Make the editor read-only
 resultEditor.renderer.setShowPrintMargin(false); // Remove the gray line
