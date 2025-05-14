@@ -256,7 +256,7 @@ function showResultUI(show) {
 // event listener for copy button to copy the updated SVG to clipboard
 $('#copy-btn').on('click', function () {
     navigator.clipboard.writeText(modifiedSvg).then(function () {
-        showSwal('Copied!', 'Updated SVG copied to clipboard!', true);
+        showSwal('Copied!', 'Updated SVG copied to clipboard.', true);
     }, function () {
         showSwal('Copy Failed', 'Failed to copy the updated SVG!', false);
     });
@@ -332,8 +332,10 @@ function showSwal(title, text, success) {
         confirmButtonText: 'OK',
         buttonsStyling: false,
         customClass: {
-            confirmButton: 'btn btn-primary px-6', // Apply DaisyUI button styles
+            confirmButton: 'btn btn-primary px-6 rounded-full', // Apply DaisyUI button styles
             popup: 'rounded-box bg-base-100 shadow-lg',
+            title: 'text-gray-500',
+            htmlContainer: 'text-gray-500',
         },
     });
 }
