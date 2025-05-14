@@ -333,7 +333,7 @@ function showSwal(title, text, success) {
         buttonsStyling: false,
         customClass: {
             confirmButton: 'btn btn-primary px-6', // Apply DaisyUI button styles
-            popup: 'rounded-box',
+            popup: 'rounded-box bg-base-100 shadow-lg',
         },
     });
 }

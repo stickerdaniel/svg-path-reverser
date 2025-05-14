@@ -1,6 +1,6 @@
 # SVG Path Reverser
 
-A web application that allows users to reverse specific paths in an SVG file. Paste your SVG code, select paths to reverse, and obtain the updated modified SVG with the reversed paths.
+A web application that allows users to reverse specific paths in an SVG file. Paste your SVG code, select paths to reverse, and obtain the updated modified SVG with the reversed paths. Useful for animating SVGs using the [stroke-dashoffset](https://css-tricks.com/almanac/properties/s/stroke-dashoffset/) technique
 
 ## Features
 
@@ -9,4 +9,4 @@ A web application that allows users to reverse specific paths in an SVG file. Pa
 - Preserve all original SVG attributes, including classes and comments.
 - View and copy the updated SVG code.
 
-<img width="1038" alt="Bildschirmfoto 2024-09-23 um 17 25 19" src="https://github.com/user-attachments/assets/a6fd1b89-171f-4526-a7ea-d1c18b9d64c0">
+<img width="1038" alt="UI Showcase SvgPath" src="https://github.com/user-attachments/assets/3375c650-8d09-405b-bb96-fbce963f15ad">
