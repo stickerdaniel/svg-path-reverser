@@ -2,7 +2,7 @@
 
 A web application that allows users to reverse specific paths in an SVG file. Paste your SVG code, select paths to reverse, and obtain the updated modified SVG with the reversed paths. Useful for animating SVGs using the [stroke-dashoffset](https://css-tricks.com/almanac/properties/s/stroke-dashoffset/) technique
 
-Live Demo: https://svg-path-revert.vercel.app/
+Live Demo: https://svg-reverse.daniel.sticker.name/
 
 ## Features
 
