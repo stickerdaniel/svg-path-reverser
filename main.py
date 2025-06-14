@@ -158,51 +158,51 @@ def reverse_paths():
                                                'delay': item.get('delay'),
                                                'easing': item.get('easing')} for item in path_data}
 
-    # Parse the SVG content
-    parser = et.XMLParser(recover=True)
-    # If the content does not start with '<svg', wrap it in an <svg> tag
-    if not svg_content.strip().startswith('<svg'):
-        svg_content = f'<svg xmlns="http://www.w3.org/2000/svg">{svg_content}</svg>'
-    root = et.fromstring(svg_content.encode('utf-8'), parser=parser)
-    # Find all path elements
-    all_paths = root.xpath('.//svg:path | .//path', namespaces={'svg': 'http://www.w3.org/2000/svg'})
-    for idx, path in enumerate(all_paths):
-        if idx in paths_to_reverse:
-            d_attr = path.attrib.get('d')
-            path_object = parse_path(d_attr)
-            reversed_path = path_object.reversed().d()
-            path.set('d', reversed_path)  # Set the reversed path back to the SVG
+        # Parse the SVG content
+        parser = et.XMLParser(recover=True)
+        # If the content does not start with '<svg', wrap it in an <svg> tag
+        if not svg_content.strip().startswith('<svg'):
+            svg_content = f'<svg xmlns="http://www.w3.org/2000/svg">{svg_content}</svg>'
+        root = et.fromstring(svg_content.encode('utf-8'), parser=parser)
+        # Find all path elements
+        all_paths = root.xpath('.//svg:path | .//path', namespaces={'svg': 'http://www.w3.org/2000/svg'})
+        for idx, path in enumerate(all_paths):
+            if idx in paths_to_reverse:
+                d_attr = path.attrib.get('d')
+                path_object = parse_path(d_attr)
+                reversed_path = path_object.reversed().d()
+                path.set('d', reversed_path)  # Set the reversed path back to the SVG
 
-        # Update the class attribute to include duration, delay, and easing classes
-        classes = path.attrib.get('class', '').split()
-        # Remove existing duration-*, delay-*, and ease-* classes
-        classes = [cls for cls in classes if not (cls.startswith('duration-') or cls.startswith('delay-') or cls.startswith('ease-'))]
-        # Get duration, delay, and easing from path_data_dict
-        duration = path_data_dict.get(idx, {}).get('duration')
-        delay = path_data_dict.get(idx, {}).get('delay')
-        easing = path_data_dict.get(idx, {}).get('easing')
-        # If duration is provided
-        if duration:
-            duration_class_value = duration.replace('.', '_')
-            duration_class = f'duration-{duration_class_value}'
-            classes.append(duration_class)
-        # If delay is provided
-        if delay:
-            delay_class_value = delay.replace('.', '_')
-            delay_class = f'delay-{delay_class_value}'
-            classes.append(delay_class)
-        # If easing is provided
-        if easing:
-            easing_class_value = easing.replace('.', '_')
-            easing_class = f'ease-{easing_class_value}'
-            classes.append(easing_class)
-        # Update the class attribute
-        if classes:
-            path.attrib['class'] = ' '.join(classes)
-        else:
-            # Remove class attribute if empty
-            if 'class' in path.attrib:
-                del path.attrib['class']
+            # Update the class attribute to include duration, delay, and easing classes
+            classes = path.attrib.get('class', '').split()
+            # Remove existing duration-*, delay-*, and ease-* classes
+            classes = [cls for cls in classes if not (cls.startswith('duration-') or cls.startswith('delay-') or cls.startswith('ease-'))]
+            # Get duration, delay, and easing from path_data_dict
+            duration = path_data_dict.get(idx, {}).get('duration')
+            delay = path_data_dict.get(idx, {}).get('delay')
+            easing = path_data_dict.get(idx, {}).get('easing')
+            # If duration is provided
+            if duration:
+                duration_class_value = duration.replace('.', '_')
+                duration_class = f'duration-{duration_class_value}'
+                classes.append(duration_class)
+            # If delay is provided
+            if delay:
+                delay_class_value = delay.replace('.', '_')
+                delay_class = f'delay-{delay_class_value}'
+                classes.append(delay_class)
+            # If easing is provided
+            if easing:
+                easing_class_value = easing.replace('.', '_')
+                easing_class = f'ease-{easing_class_value}'
+                classes.append(easing_class)
+            # Update the class attribute
+            if classes:
+                path.attrib['class'] = ' '.join(classes)
+            else:
+                # Remove class attribute if empty
+                if 'class' in path.attrib:
+                    del path.attrib['class']
 
         # Convert the updated XML back to string format
         updated_svg = et.tostring(root, encoding='unicode', method='xml', pretty_print=True)
