@@ -15,13 +15,14 @@ app.config.update({
 })
 
 # Analytics configuration
-UMAMI_URL = os.environ.get('PUBLIC_UMAMI_SRC', 'https://umami.daniel.sticker.name').replace('/script.js', '')
+UMAMI_SRC = os.environ.get('PUBLIC_UMAMI_SRC', 'https://insights.inframs.de/script.js')
+UMAMI_URL = UMAMI_SRC.replace('/script.js', '') if UMAMI_SRC.endswith('/script.js') else UMAMI_SRC.rsplit('/', 1)[0]
 UMAMI_WEBSITE_ID = os.environ.get('PUBLIC_UMAMI_WEBSITE_ID', 'your-website-id')
 
 def track_server_event(event_name, event_data=None):
     """Track server-side events to Umami analytics."""
     try:
-        if not UMAMI_URL or UMAMI_WEBSITE_ID == 'your-website-id':
+        if not UMAMI_URL or not UMAMI_WEBSITE_ID or UMAMI_WEBSITE_ID == 'your-website-id':
             return  # Skip tracking if not configured
             
         payload = {
