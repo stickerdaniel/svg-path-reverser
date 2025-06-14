@@ -68,16 +68,34 @@
     <div class="svg-editor-container container-outline">
         <div class="svg-editor" id="input-editor"></div>
     </div>
-    <div class="flex mt-3 mb-6">
+    <div class="flex mt-3 mb-6 gap-2">
         <button id="parse-btn" class="btn btn-primary rounded-full">
-            <!-- SVG Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                 fill="currentColor">
-                <path d="M0 0h24v24H0z" fill="none"/>
-                <path d="M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 2.44-2.44 2.12 2.12-2.44 2.44z"/>
+            <!-- Parse Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wand-sparkles-icon lucide-wand-sparkles">
+                <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/>
+                <path d="m14 7 3 3"/>
+                <path d="M5 6v4"/>
+                <path d="M19 14v4"/>
+                <path d="M10 2v2"/>
+                <path d="M7 8H3"/>
+                <path d="M21 16h-4"/>
+                <path d="M11 3H9"/>
             </svg>
             Parse SVG
         </button>
+        <div class="relative">
+            <input type="file" id="file-input" accept=".svg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            <button class="btn btn-primary rounded-full">
+                <!-- Upload Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image-up-icon lucide-image-up">
+                    <path d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21"/>
+                    <path d="m14 19.5 3-3 3 3"/>
+                    <path d="M17 22v-5.5"/>
+                    <circle cx="9" cy="9" r="2"/>
+                </svg>
+                Upload SVG
+            </button>
+        </div>
     </div>
 
     <!-- Paths List and SVG Rendering -->
@@ -117,17 +135,18 @@
         <div class="flex justify-end mb-3 mt-6 gap-2 flex-wrap">
             <!-- Download Animation script -->
             <button id="download-btn" class="btn btn-secondary rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                     fill="currentColor">
-                    <path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download">
+                    <path d="M12 15V3"/>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <path d="m7 10 5 5 5-5"/>
                 </svg>
                 Download Animation
             </button>
             <!-- Copy to Clipboard Button -->
             <button id="copy-btn" class="btn btn-secondary rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                     fill="currentColor">
-                    <path d="M 360.0,-320.0 L 360.0,-800.0 L 360.0,-320.0 M 200.0,-80.0 L 640.0,-80.0 L 640.0,-160.0 L 200.0,-160.0 L 200.0,-720.0 L 120.0,-720.0 L 120.0,-160.0 Q 120.0,-127.0 143.5,-103.5 Q 167.0,-80.0 200.0,-80.0 M 360.0,-320.0 L 360.0,-800.0 L 720.0,-800.0 L 720.0,-320.0 L 360.0,-320.0 M 360.0,-240.0 L 720.0,-240.0 Q 753.0,-240.0 776.5,-263.5 Q 800.0,-287.0 800.0,-320.0 L 800.0,-800.0 Q 800.0,-833.0 776.5,-856.5 Q 753.0,-880.0 720.0,-880.0 L 360.0,-880.0 Q 327.0,-880.0 303.5,-856.5 Q 280.0,-833.0 280.0,-800.0 L 280.0,-320.0 Q 280.0,-287.0 303.5,-263.5 Q 327.0,-240.0 360.0,-240.0"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy">
+                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
                 </svg>
                 Copy Updated SVG
             </button>

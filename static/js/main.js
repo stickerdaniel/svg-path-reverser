@@ -197,6 +197,44 @@ $('#parse-btn').on('click', function () {
     });
 });
 
+// File upload handler
+$('#file-input').on('change', function(event) {
+    const file = event.target.files[0];
+    if (file && file.type === 'image/svg+xml') {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const svgContent = e.target.result;
+            editor.setValue(svgContent, -1);
+            
+            // Track file upload
+            if (typeof umami !== 'undefined') {
+                umami.track('svg_file_uploaded', {
+                    file_size: file.size > 10000 ? 'large' : file.size > 2000 ? 'medium' : 'small',
+                    file_name_has_extension: file.name.endsWith('.svg')
+                });
+            }
+            
+            // Automatically trigger the parse functionality
+            $('#parse-btn').click();
+        };
+        reader.readAsText(file);
+    } else {
+        showSwal('Invalid File', 'Please select a valid SVG file.', false);
+        
+        // Track invalid file upload
+        if (typeof umami !== 'undefined') {
+            umami.track('processing_error', {
+                error_type: 'upload',
+                error_message: 'invalid_file_type',
+                file_type: file ? file.type : 'unknown'
+            });
+        }
+    }
+    
+    // Reset the input so the same file can be selected again
+    event.target.value = '';
+});
+
 $(document).on('change', '#path-list input:checkbox', function () {
     const pathIndex = parseInt($(this).val(), 10);
     const isChecked = $(this).is(':checked');
