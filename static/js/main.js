@@ -60,6 +60,14 @@ $('#parse-btn').on('click', function () {
             if (data.length === 0) {
                 showSwal('No Paths Found', 'No paths found in the SVG!', false);
                 showResultUI(false);
+                // Track parsing failure
+                if (typeof umami !== 'undefined') {
+                    umami.track('processing_error', {
+                        error_type: 'parse',
+                        error_message: 'no_paths_found',
+                        svg_size: svgCode.length > 10000 ? 'large' : svgCode.length > 2000 ? 'medium' : 'small'
+                    });
+                }
                 return;
             }
 
@@ -159,8 +167,32 @@ $('#parse-btn').on('click', function () {
 
             // Render the original SVG in the preview
             $('#svg-preview').html(originalSvg);
+
+            // Track successful SVG parsing
+            if (typeof umami !== 'undefined') {
+                const hasClasses = data.some(path => path.class);
+                const hasIds = data.some(path => path.id);
+                const hasAnimationClasses = data.some(path => path.duration || path.delay || path.easing);
+                
+                umami.track('svg_parsed', {
+                    paths_found: data.length,
+                    has_classes: hasClasses,
+                    has_ids: hasIds,
+                    has_animation_classes: hasAnimationClasses,
+                    svg_size: svgCode.length > 10000 ? 'large' : svgCode.length > 2000 ? 'medium' : 'small'
+                });
+            }
         }, error: function (xhr) {
             showSwal('Error', 'Error parsing the SVG!\n' + xhr.responseText, false);
+            // Track parsing error
+            if (typeof umami !== 'undefined') {
+                umami.track('processing_error', {
+                    error_type: 'parse',
+                    error_message: 'svg_parse_failed',
+                    status_code: xhr.status,
+                    svg_size: svgCode.length > 10000 ? 'large' : svgCode.length > 2000 ? 'medium' : 'small'
+                });
+            }
         }
     });
 });
@@ -181,6 +213,22 @@ $(document).on('change', '#path-list input:checkbox', function () {
         reversedPaths = reversedPaths.filter(idx => idx !== pathIndex);
         // Update the status badge
         $('#status' + index).text('normal').removeClass('badge-success').addClass('badge-outline');
+    }
+
+    // Track path toggle event
+    if (typeof umami !== 'undefined') {
+        const pathItem = $(this).closest('.path-item');
+        const hasId = pathItem.find('.badge-secondary').length > 0;
+        const hasClasses = pathItem.find('.badge-primary').length > 0;
+        
+        umami.track('path_toggled', {
+            action: isChecked ? 'reversed' : 'normal',
+            path_index: pathIndex,
+            total_paths: $('#path-list input:checkbox').length,
+            reversed_paths_count: reversedPaths.length,
+            has_id: hasId,
+            has_classes: hasClasses
+        });
     }
 
     // Update the SVG with the reversed paths
@@ -236,6 +284,15 @@ function updateSvgWithReversedPaths() {
         },
         error: function (xhr) {
             showSwal('Error', 'Error updating the SVG with reversed paths!\n' + xhr.responseText, false);
+            // Track reverse paths error
+            if (typeof umami !== 'undefined') {
+                umami.track('processing_error', {
+                    error_type: 'reverse',
+                    error_message: 'path_reverse_failed',
+                    status_code: xhr.status,
+                    paths_to_reverse: reversedPaths.length
+                });
+            }
         }
     });
 }
@@ -257,8 +314,26 @@ function showResultUI(show) {
 $('#copy-btn').on('click', function () {
     navigator.clipboard.writeText(modifiedSvg).then(function () {
         showSwal('Copied!', 'Updated SVG copied to clipboard.', true);
+        
+        // Track successful copy
+        if (typeof umami !== 'undefined') {
+            umami.track('svg_copied', {
+                paths_total: $('#path-list input:checkbox').length,
+                paths_reversed: reversedPaths.length,
+                svg_size: modifiedSvg.length > 10000 ? 'large' : modifiedSvg.length > 2000 ? 'medium' : 'small',
+                has_animation_data: $('.input-duration').filter(function() { return $(this).val() !== ''; }).length > 0
+            });
+        }
     }, function () {
         showSwal('Copy Failed', 'Failed to copy the updated SVG!', false);
+        
+        // Track copy failure
+        if (typeof umami !== 'undefined') {
+            umami.track('processing_error', {
+                error_type: 'copy',
+                error_message: 'clipboard_failed'
+            });
+        }
     });
 });
 
@@ -288,9 +363,33 @@ $('#download-btn').on('click', function () {
                 link.click();  // Programmatically click the link to trigger the download
                 document.body.removeChild(link);  // Clean up after download
                 showSwal('Download Complete', 'The animation.zip has been downloaded successfully!', true);
+                
+                // Track successful download
+                if (typeof umami !== 'undefined') {
+                    const hasCustomTiming = $('.input-duration').filter(function() { return $(this).val() !== ''; }).length > 0 ||
+                                          $('.input-delay').filter(function() { return $(this).val() !== ''; }).length > 0;
+                    const customEasing = $('.select-easing-function').filter(function() { return $(this).val() !== 'power1'; }).length > 0;
+                    
+                    umami.track('animation_downloaded', {
+                        paths_total: $('#path-list input:checkbox').length,
+                        paths_reversed: reversedPaths.length,
+                        animation_scale: animationScale,
+                        has_custom_timing: hasCustomTiming,
+                        has_custom_easing: customEasing,
+                        svg_size: modifiedSvg.length > 10000 ? 'large' : modifiedSvg.length > 2000 ? 'medium' : 'small'
+                    });
+                }
             } else if (contentType === 'text/plain') {
                 // Handle plain text error messages
                 showSwal('Download Failed', `Error: ${data}`, false);
+                
+                // Track download error
+                if (typeof umami !== 'undefined') {
+                    umami.track('processing_error', {
+                        error_type: 'download',
+                        error_message: 'download_failed_text_error'
+                    });
+                }
             }
         },
         error: function (xhr) {
@@ -301,6 +400,15 @@ $('#download-btn').on('click', function () {
                 showSwal('Download Failed', `Error: ${xhr.responseText}`, false);
             } else {
                 showSwal('Download Failed', 'An unexpected error occurred while downloading the animation zip.', false);
+            }
+            
+            // Track download error
+            if (typeof umami !== 'undefined') {
+                umami.track('processing_error', {
+                    error_type: 'download',
+                    error_message: 'download_failed_xhr_error',
+                    status_code: xhr.status
+                });
             }
         }
     });
@@ -314,6 +422,16 @@ $('#animate-original').on('click', function () {
     // Animate the paths
     let svgElement = $('#svg-preview svg')[0];
     animateSVGPaths(svgElement, animationScale);
+    
+    // Track animation preview
+    if (typeof umami !== 'undefined') {
+        umami.track('animation_previewed', {
+            type: 'original',
+            paths_count: $('#path-list input:checkbox').length,
+            animation_scale: animationScale,
+            reversed_paths: reversedPaths.length
+        });
+    }
 });
 $('#animate-edited').on('click', function () {
     // Display the modified SVG
@@ -321,6 +439,16 @@ $('#animate-edited').on('click', function () {
     // Animate the paths
     let svgElement = $('#svg-preview svg')[0];
     animateSVGPaths(svgElement, animationScale);
+    
+    // Track animation preview
+    if (typeof umami !== 'undefined') {
+        umami.track('animation_previewed', {
+            type: 'edited',
+            paths_count: $('#path-list input:checkbox').length,
+            animation_scale: animationScale,
+            reversed_paths: reversedPaths.length
+        });
+    }
 });
 
 // sweetalert2 configuration
@@ -360,6 +488,18 @@ $pathList.on('input', '.input-duration', function () {
     duration = duration.replace(/[^\d.]/g, '');
     // Update the input field with the cleaned value
     $(this).val(duration);
+    
+    // Track animation configuration
+    if (typeof umami !== 'undefined' && duration !== '') {
+        const pathIndex = $(this).closest('.path-item').index();
+        umami.track('animation_configured', {
+            parameter: 'duration',
+            value: duration,
+            path_index: pathIndex,
+            total_paths: $('#path-list .path-item').length
+        });
+    }
+    
     // Update the SVG with new duration
     updateSvgWithReversedPaths();
 });
@@ -370,15 +510,57 @@ $pathList.on('input', '.input-delay', function () {
     delay = delay.replace(/[^\d.]/g, '');
     // Update the input field with the cleaned value
     $(this).val(delay);
+    
+    // Track animation configuration
+    if (typeof umami !== 'undefined' && delay !== '') {
+        const pathIndex = $(this).closest('.path-item').index();
+        umami.track('animation_configured', {
+            parameter: 'delay',
+            value: delay,
+            path_index: pathIndex,
+            total_paths: $('#path-list .path-item').length
+        });
+    }
+    
     // Update the SVG with new delay
     updateSvgWithReversedPaths();
 });
 
 // Event listeners for easing function and type selects
 $pathList.on('change', '.select-easing-function', function() {
+    // Track easing function change
+    if (typeof umami !== 'undefined') {
+        const pathIndex = $(this).closest('.path-item').index();
+        const easingFunction = $(this).val();
+        const easingType = $(this).siblings('.select-easing-type').val();
+        
+        umami.track('animation_configured', {
+            parameter: 'easing_function',
+            value: easingFunction,
+            easing_type: easingType,
+            path_index: pathIndex,
+            total_paths: $('#path-list .path-item').length
+        });
+    }
+    
     updateSvgWithReversedPaths();
 });
 
 $pathList.on('change', '.select-easing-type', function() {
+    // Track easing type change
+    if (typeof umami !== 'undefined') {
+        const pathIndex = $(this).closest('.path-item').index();
+        const easingType = $(this).val();
+        const easingFunction = $(this).siblings('.select-easing-function').val();
+        
+        umami.track('animation_configured', {
+            parameter: 'easing_type',
+            value: easingType,
+            easing_function: easingFunction,
+            path_index: pathIndex,
+            total_paths: $('#path-list .path-item').length
+        });
+    }
+    
     updateSvgWithReversedPaths();
 });

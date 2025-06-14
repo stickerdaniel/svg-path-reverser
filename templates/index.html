@@ -43,6 +43,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Custom Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <!-- Umami Analytics -->
+    {% if config.get('PUBLIC_UMAMI_SRC') and config.get('PUBLIC_UMAMI_WEBSITE_ID') %}
+    <script defer src="{{ config.get('PUBLIC_UMAMI_SRC', 'https://umami.daniel.sticker.name/script.js') }}" data-website-id="{{ config.get('PUBLIC_UMAMI_WEBSITE_ID', 'your-website-id') }}"></script>
+    {% endif %}
 </head>
 <body class="bg-base-200" data-theme="dim">
 
